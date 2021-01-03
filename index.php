@@ -44,7 +44,10 @@ Class LoginManager {
 						$this->register($email = $request['email'], $first_name = $request['first_name'], $last_name = $request['last_name'], $password = $request['password']); 
 					}
 					break;
-				case 'authenticate':
+				case 'actviation.script':
+					
+					break;
+				case 'activate':
 					if (isset($request['email']) && isset($request['authCode'])) {
 						$this->activateNew($request['email'], $request['authCode']);
 					}
@@ -91,7 +94,7 @@ Class LoginManager {
 			print 'A confirmation mail has been sent, please confirm your account registration.';
 			return true;
 		} else {
-			$user->printMsg();
+			$this->user->printMsg();
 			return false;
 		}
 	}

@@ -68,7 +68,7 @@ class User {
             $user = $stmt->fetch();
 
             if(password_verify($password, $user['password'])) {
-                if($user['wrong_logins'] <= $this->permitedAttemps) {
+                if($user['failures'] <= $this->permitedAttemps) {
                     $this->user = $user;
                     session_regenerate_id();
                     $_SESSION['user']['id'] = $user['id'];
@@ -105,7 +105,7 @@ class User {
             return false;
         }
         if(!(isset($email) && isset($first_name) && isset($last_name) && isset($password) && filter_var($email, FILTER_VALIDATE_EMAIL))) {
-            $this->msg = 'Inesrt all valid requered fields.';
+            $this->msg = 'All fields are required.';
             return false;
         }
 
@@ -137,8 +137,9 @@ class User {
         $stmt->execute([$email]);
         $code = $stmt->fetch();
 
-        $subject = 'Confirm your registration';
-        $message = 'Please confirm you registration by pasting this code in the confirmation box: '.$code['confirm_code'];
+        $subject = "Confirm your registration";
+        $message = "Please confirm you registration by pasting this code in the confirmation box: ".$code['confirm_code']."<br>
+                    <link href='www.envirosample.online?activity=activation.script&authCode=".$code['confirm_code']."'/><br>";
         // $headers = 'X-Mailer: PHP/' . phpversion();
         // Use below for local testing
         $headers = 'From: local.dev.env@gmail.com' . "\r\n" . 'MIME-Version: 1.0' . "\r\n" . 'Content-type: text/html; charset=utf-8';
@@ -162,7 +163,7 @@ class User {
         $stmt = $pdo->prepare('UPDATE users SET confirmed = 1 WHERE email = ? and confirm_code = ?');
         $stmt->execute([$email,$confCode]);
         if($stmt->rowCount()>0) {
-            $stmt = $pdo->prepare('SELECT id, first_name, last_name, email, wrong_logins, user_role FROM users WHERE email = ? and confirmed = 1 limit 1');
+            $stmt = $pdo->prepare('SELECT id, first_name, last_name, email, failures, user_role FROM users WHERE email = ? and confirmed = 1 limit 1');
             $stmt->execute([$email]);
             $user = $stmt->fetch();
 
@@ -284,7 +285,7 @@ class User {
     private function registerWrongLoginAttemp($email)
     {
         $pdo = $this->pdo;
-        $stmt = $pdo->prepare('UPDATE users SET wrong_logins = wrong_logins + 1 WHERE email = ?');
+        $stmt = $pdo->prepare('UPDATE users SET failures = failures + 1 WHERE email = ?');
         $stmt->execute([$email]);
     }
 

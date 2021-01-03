@@ -114,7 +114,7 @@ a:hover {
 	background-color: rgba(68, 67, 67, 0.582);
 	border-color: rgba(0, 0, 0, 0.15);
 }
-.fa-user-plus, .fa-sign-in-alt {
+.fa-user-plus, .fa-sign-in-alt, .fa-user-circle {
 	color:  #ffc107;
 	background-image: -webkit-linear-gradient(left,rgba(0, 0, 0, 0),rgba(100, 14, 212, 0.15),rgba(0, 0, 0, 0));
 	background-image: -moz-linear-gradient(left,rgba(0,0,0,0),rgba(100, 14, 212, 0.15),rgba(0,0,0,0));
