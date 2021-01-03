@@ -63,7 +63,7 @@ class User {
             return false;
         } else {
             $pdo = $this->pdo;
-            $stmt = $pdo->prepare('SELECT id, first_name, last_name, email, failures, `password`, user_role FROM users WHERE email = ? and confirmed = 1 limit 1');
+            $stmt = $pdo->prepare('SELECT id, first_name, last_name, email, failures, `password`, permission FROM users WHERE email = ? and confirmed = 1 limit 1');
             $stmt->execute([$email]);
             $user = $stmt->fetch();
 
@@ -75,7 +75,7 @@ class User {
                     $_SESSION['user']['first_name'] = $user['first_name'];
                     $_SESSION['user']['last_name'] = $user['last_name'];
                     $_SESSION['user']['email'] = $user['email'];
-                    $_SESSION['user']['user_role'] = $user['user_role'];
+                    $_SESSION['user']['permission'] = $user['permission'];
                     return true;
                 } else {
                     $this->msg = 'This user account is blocked, please contact our support department.';
@@ -137,9 +137,12 @@ class User {
         $stmt->execute([$email]);
         $code = $stmt->fetch();
 
-        $subject = "Confirm your registration";
-        $message = "Please confirm you registration by pasting this code in the confirmation box: ".$code['confirm_code']."<br>
-                    <link href='www.envirosample.online?activity=activation.script&authCode=".$code['confirm_code']."'/><br>";
+        $subject = "Activate your registration";
+        $message = "Click this link to activate you registration"."< \br>";
+        $message .= '<form method="post" name="acvtivationform" action="envirosample.online/index.php">';
+        $message .= '<input type="text" name="confirm_code" value="'.$code['confirm_code'].'" readonly>';
+        $message .= '<input type="submit" value="Activate">';
+        $message .= '</form>';
         // $headers = 'X-Mailer: PHP/' . phpversion();
         // Use below for local testing
         $headers = 'From: local.dev.env@gmail.com' . "\r\n" . 'MIME-Version: 1.0' . "\r\n" . 'Content-type: text/html; charset=utf-8';
@@ -157,25 +160,28 @@ class User {
     * @param string $confCode Confirmation code.
     * @return boolean of success.
     */
-    public function emailActivation($email, $confCode)
+    public function emailActivation($email, $authCode)
     {
         $pdo = $this->pdo;
-        $stmt = $pdo->prepare('UPDATE users SET confirmed = 1 WHERE email = ? and confirm_code = ?');
-        $stmt->execute([$email,$confCode]);
+        $stmt = $pdo->prepare('UPDATE users SET confirmed = 1 WHERE email = ? and auth_code = ?');
+        $stmt->execute([$email, $authCode]);
+
         if($stmt->rowCount()>0) {
-            $stmt = $pdo->prepare('SELECT id, first_name, last_name, email, failures, user_role FROM users WHERE email = ? and confirmed = 1 limit 1');
+            $stmt = $pdo->prepare('SELECT id, first_name, last_name, email, failures, permission FROM users WHERE email = ? and confirmed = 1 limit 1');
             $stmt->execute([$email]);
             $user = $stmt->fetch();
 
             $this->user = $user;
-            session_regenerate_id();
+        
+            session_start();
             if(!empty($user['email'])) {
             	$_SESSION['user']['id'] = $user['id'];
 	            $_SESSION['user']['first_name'] = $user['first_name'];
 	            $_SESSION['user']['last_name'] = $user['last_name'];
 	            $_SESSION['user']['email'] = $user['email'];
-	            $_SESSION['user']['user_role'] = $user['user_role'];
-	            return true;
+                $_SESSION['user']['permission'] = $user['permission'];
+                
+                return true;
             } else {
             	$this->msg = 'Account activitation failed.';
             	return false;

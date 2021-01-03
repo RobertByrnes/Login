@@ -1,18 +1,18 @@
 <?php
-/* Smarty version 3.1.34-dev-7, created on 2021-01-03 14:19:12
+/* Smarty version 3.1.34-dev-7, created on 2021-01-03 19:25:43
   from 'C:\wamp64\www\Repositories\login\templates\login.registerform.tpl' */
 
 /* @var Smarty_Internal_Template $_smarty_tpl */
 if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   'version' => '3.1.34-dev-7',
-  'unifunc' => 'content_5ff1d260b57729_62664419',
+  'unifunc' => 'content_5ff21a374dae37_99564760',
   'has_nocache_code' => false,
   'file_dependency' => 
   array (
     'f30554b3c7f19f6932ccf770681ea9aa1b7efa63' => 
     array (
       0 => 'C:\\wamp64\\www\\Repositories\\login\\templates\\login.registerform.tpl',
-      1 => 1609683367,
+      1 => 1609701874,
       2 => 'file',
     ),
   ),
@@ -20,7 +20,7 @@ if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   array (
   ),
 ),false)) {
-function content_5ff1d260b57729_62664419 (Smarty_Internal_Template $_smarty_tpl) {
+function content_5ff21a374dae37_99564760 (Smarty_Internal_Template $_smarty_tpl) {
 ?><div class="row">
     <div class="col-lg-4 offset-lg-2 col-md-4 offset-md-2 col-sm-12 mt-5">
         <div class="card card-chart">
@@ -30,17 +30,17 @@ function content_5ff1d260b57729_62664419 (Smarty_Internal_Template $_smarty_tpl)
             <div class="card-body justify-content-center">
                 <form id="login-form" method="post" role="form">
                     <div class="row form-group justify-content-center">
-                        <input type="text" name="username" id="username" tabindex="1" class="form-control"
-                            placeholder="Email" value="">
+                        <input type="text" name="username" id="username" tabindex="2" class="form-control"
+                            placeholder="Email" value="" autocomplete="off">
                     </div>
                     <div class="row form-group justify-content-center">
                         <input type="password" name="password" id="password1" tabindex="2" class="form-control"
-                            placeholder="Password">
+                            placeholder="Password" autocomplete="off">
                     </div>
                     <div class="form-group">
                         <div class="row justify-content-center">
                             <div class="col-sm-6 col-sm-offset-3">
-                                <input type="button" name="login-submit" id="login-submit" tabindex="4"
+                                <input type="button" name="login-submit" id="login-submit" tabindex="2"
                                     class="btn btn-register text-muted font-weight-bold" value="Log In">
                             </div>
                         </div>
@@ -70,16 +70,16 @@ function content_5ff1d260b57729_62664419 (Smarty_Internal_Template $_smarty_tpl)
                             placeholder="Email Address" value="" autocomplete="off">
                     </div>
                     <div class="row form-group justify-content-center">
-                        <input type="password" name="password" id="password2" tabindex="2" class="form-control"
+                        <input type="password" name="password" id="password2" tabindex="1" class="form-control"
                             placeholder="Password" autocomplete="off">
                     </div>
                     <div class="row form-group justify-content-center">
-                        <input type="password" name="confirm-password" id="confirm-password" tabindex="2"
+                        <input type="password" name="confirm-password" id="confirm-password" tabindex="1"
                             class="form-control" placeholder="Confirm Password" autocomplete="off">
                     </div>
                     <div class="form-group">
                         <div class="row justify-content-center">
-                            <input type="button" name="register-submit" id="register-submit" tabindex="4"
+                            <input type="button" name="register-submit" id="register-submit" tabindex="1"
                                 class="btn btn-register text-muted font-weight-bold" value="Register Now">
                         </div>
                     </div>

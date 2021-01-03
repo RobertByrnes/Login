@@ -28,14 +28,15 @@ $(function() {
 		if($("#useractivation").val() != "" && $("#activationcode").val() != "" && validateEmail($("#useractivation").val())){
 			$.ajax({
 			  method: "POST",
-			  url: "<?=activatefile?>",
-			  data: { email: $("#useractivation").val(), code: $("#activationcode").val() }
+			  url: "index.php",
+			  data: { activity: 'activate', email: $("#useractivation").val(), authCode: $("#activationcode").val() }
 			}).done(function(msg) {
 				if(msg !== ""){
 					alert(msg);
 				}else{
-					window.location = "<?=userfile?>";
+					window.location = "index.php";
 				}
+				window.location = "index.php";
 			});
 		}else{
 			alert("Please fill all fields with valid data!");

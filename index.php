@@ -33,6 +33,7 @@ Class LoginManager {
 
 	private function loginHandler($request)
 	{
+		$templateData = array();
 		if (isset($request['activity'])) {
 			$activity = $request['activity'];
 		} else {
@@ -44,8 +45,9 @@ Class LoginManager {
 						$this->register($email = $request['email'], $first_name = $request['first_name'], $last_name = $request['last_name'], $password = $request['password']); 
 					}
 					break;
-				case 'actviation.script':
-					
+					case 'activation.script':
+						$templateData['authCode'] = $request['authCode'];
+						$this->displayPage($templateData, $page='activationform');
 					break;
 				case 'activate':
 					if (isset($request['email']) && isset($request['authCode'])) {
@@ -55,7 +57,7 @@ Class LoginManager {
 				case 'login':
 					if (isset($request['email']) && isset($request['password'])) {
 						$this->login($request['email'], $request['password']);
-						$this->displayPage($templateData=array(), $page='userpage');
+						$this->displayPage($templateData, $page='userpage');
 					}
 					break;
 				case 'logout':
@@ -67,12 +69,16 @@ Class LoginManager {
 			}
 	}
 
-	private function displayPage($templateData=NULL, $page=NULL)
+	private function displayPage($templateData, $page)
     {
 		if (preg_match('/wamp64|repositories/i', $_SERVER['DOCUMENT_ROOT'])){
-			$templateData['debug'] = 1;
+			if(!isset($templateData['debug'])) {
+				$templateData['debug'] = 1;
+			}
 		} else {
-			$templateData['debug'] = 0;
+			if(!isset($templateData['debug'])) {
+				$templateData['debug'] = 0;
+			}
 		}
         global $smarty;
         $smarty->assign('templateData', $templateData);
@@ -105,6 +111,7 @@ Class LoginManager {
 		$code = filter_input(INPUT_POST, 'authCode', FILTER_DEFAULT);
 		
 		if($this->user->emailActivation($email, $code)) {
+			print 'Account activitation successful, login to continue.';
 			return true;
 		} else {
 			$this->user->printMsg();
