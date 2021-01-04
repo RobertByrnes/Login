@@ -59,7 +59,7 @@ class User {
     public function login($email, $password)
     {
         if(is_null($this->pdo)) {
-            $this->msg = 'Connection did not work out!';
+            $this->msg = 'Connection failed, please contact IT support.';
             return false;
         } else {
             $pdo = $this->pdo;
@@ -78,7 +78,7 @@ class User {
                     $_SESSION['user']['permission'] = $user['permission'];
                     return true;
                 } else {
-                    $this->msg = 'This user account is blocked, please contact our support department.';
+                    $this->msg = 'This user account is blocked, please contact IT support.';
                     return false;
                 }
             } else {
@@ -110,9 +110,9 @@ class User {
         }
 
         $password = $this->hashPass($password);
-        $confCode = $this->hashPass(date('Y-m-d H:i:s').$email);
-        $stmt = $pdo->prepare('INSERT INTO users (first_name, last_name, email, `password`, confirm_code) VALUES (?, ?, ?, ?, ?)');
-        if($stmt->execute([$first_name,$last_name,$email,$password,$confCode])) {
+        $authCode = $this->hashPass(date('Y-m-d H:i:s').$email);
+        $stmt = $pdo->prepare('INSERT INTO users (first_name, last_name, email, `password`, auth_code) VALUES (?, ?, ?, ?, ?)');
+        if($stmt->execute([$first_name, $last_name, $email, $password, $authCode])) {
             if($this->sendConfirmationEmail($email)) {
                 return true;
             } else {
@@ -198,20 +198,26 @@ class User {
     * @param string $password New password.
     * @return boolean of success.
     */
-    public function passwordChange($id, $password)
+    public function passwordChange($email, $oldPassword, $newPassword)
     {
-        $pdo = $this->pdo;
-        if(isset($id) && isset($password)) {
-            $stmt = $pdo->prepare('UPDATE users SET password = ? WHERE id = ?');
-            if($stmt->execute([$id,$this->hashPass($password)])) {
-                return true;
+        if(isset($email) && isset($oldPassword) && isset($newPassword)) {
+            $pdo = $this->pdo;
+            $stmt = $pdo->prepare('SELECT `password` FROM users WHERE email = ?');
+            $stmt->execute([$email]);
+            $user = $stmt->fetch();
+
+            if(password_verify($oldPassword, $user['password'])) {
+                $stmt = $pdo->prepare('UPDATE users SET password = ? WHERE email = ?');
+                if($stmt->execute([$email, $this->hashPass($newPassword)])) {
+                    return true;
+                } else {
+                    $this->msg = 'Password change failed.';
+                    return false;
+                }
             } else {
-                $this->msg = 'Password change failed.';
+                $this->msg = 'Provide a valid email address and a ensure old passwords match.';
                 return false;
             }
-        } else {
-            $this->msg = 'Provide an ID and a password.';
-            return false;
         }
     }
 
@@ -222,23 +228,22 @@ class User {
     * @param int $role User role.
     * @return boolean of success.
     */
-    public function assignRole($id, $role)
+    public function assignRole($id, $permission)
     {
         $pdo = $this->pdo;
         if(isset($id) && isset($role)) {
-            $stmt = $pdo->prepare('UPDATE users SET role = ? WHERE id = ?');
-            if($stmt->execute([$id,$role])) {
+            $stmt = $pdo->prepare('UPDATE users SET permission = ? WHERE id = ?');
+            if($stmt->execute([$permission, $role])) {
                 return true;
             } else {
-                $this->msg = 'Role assign failed.';
+                $this->msg = 'Permission assignment failed.';
                 return false;
             }
         } else {
-            $this->msg = 'Provide a role for this user.';
+            $this->msg = 'Provide a permission level for this user.';
             return false;
         }
     }
-
 
 
     /**

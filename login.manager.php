@@ -22,15 +22,7 @@ Class LoginManager {
 		return $this->user;
 	}
 
-	// perhaps move this function to the main use application to redirect to this login application
-	// public function checkLogin() {
-	// 	if($_SESSION['user']['id'] !== ''){
-	// 		$this->user->userPage();
-	//   }else{
-	// 	  header('Location: index.php');
-	//   }
-	// }
-
+	
 	private function loginHandler($request)
 	{
 		$templateData = array();
@@ -45,9 +37,9 @@ Class LoginManager {
 						$this->register($email = $request['email'], $first_name = $request['first_name'], $last_name = $request['last_name'], $password = $request['password']); 
 					}
 					break;
-					case 'activation.script':
-						$templateData['authCode'] = $request['authCode'];
-						$this->displayPage($templateData, $page='activationform');
+				case 'activation.script':
+					$templateData['authCode'] = $request['authCode'];
+					$this->displayPage($templateData, $page='activationform');
 					break;
 				case 'activate':
 					if (isset($request['email']) && isset($request['authCode'])) {
@@ -60,14 +52,27 @@ Class LoginManager {
 						$this->displayPage($templateData, $page='userpage');
 					}
 					break;
+				case 'success':
+						header('Location: userpage.html');
+					break;
 				case 'logout':
 					$this->logout();
+					break;
+				case 'password.script':
+						$this->displayPage($templateData, $page='password.change');
+					break;
+				case 'change.password':
+					if (isset($request['email']) && isset($request['password'])) {
+						$this->passwordChange($request['email'], $request['password']);
+						$this->displayPage($templateData, $page='userpage');
+					}
 					break;
 				default:
 					$this->displayPage($templateData=array(), $page='login.registerform');
 					break;
 			}
 	}
+
 
 	private function displayPage($templateData, $page)
     {
@@ -87,7 +92,8 @@ Class LoginManager {
         $smarty->display('footer.tpl');
             
         return true;
-    }
+	}
+	
 
 	private function register($email, $first_name, $last_name, $password)
 	{
@@ -105,6 +111,7 @@ Class LoginManager {
 		}
 	}
 
+
 	private function activateNew($email, $authCode)
 	{
 		$email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
@@ -119,24 +126,40 @@ Class LoginManager {
 		}
 	}
 
+
 	private function login($email, $password)
 	{
-		
 		$email = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_EMAIL);
 		$password = filter_input(INPUT_POST, 'password', FILTER_DEFAULT);
 	
-		if($user->login( $email, $password)) {
+		if($this->user->login($email, $password)) {
 			return true;
 		} else {
-			$user->printMsg();
+			$this->user->printMsg();
 			return false;
 		}
 	}
 
+
 	private function logout()
 	{
 		$this->user->logout();
+		header('location: login.manager.php');
 
-		header('location: index.php');
+		return true;
+	}
+
+
+	private function passwordChange($email, $oldPassword, $newPassword)
+	{
+		$email = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_EMAIL);
+		$password = filter_input(INPUT_POST, 'password', FILTER_DEFAULT);
+
+		if($this->user->passwordChange($email, $oldPassword, $newPassword)) {
+			return true;
+		} else {
+			$this->user->printMsg();
+			return false;
+		}
 	}
 }
