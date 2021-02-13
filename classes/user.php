@@ -3,7 +3,8 @@
 * Secure login/registration user class.
 */
 
-require_once('includes/db.config.php');
+require_once('includes/login.db.config.php');
+require('Shifty.php');
 
 class User {
     /** @var object $pdo Copy of PDO connection */
@@ -15,6 +16,7 @@ class User {
     /** @var int number of permitted wrong login attemps */
     private $permitedAttemps = 5;
 
+
     /**
     * Connection init function
     * @param string $dsn DB connection string.
@@ -25,20 +27,30 @@ class User {
     */
     public function __construct()
     {
-        if(session_status() !== PHP_SESSION_ACTIVE) {
-            try {
-                $pdo = new PDO(dsn, username, password);
-                $this->pdo = $pdo;
-                return $this->pdo;
-            } catch(PDOException $e) { 
-                $this->msg = 'Connection did not work out!';
-                return false;
-            }
-        } else {
-            $this->msg = 'Session did not start.';
+        try {
+            $pdo = new PDO(dsn, username, password);
+            $this->pdo = $pdo;
+            return $this->pdo;
+        } catch(PDOException $e) { 
+            $this->msg = 'Connection to database failed!';
             return false;
         }
     }
+
+    private static function cipherIn($string) : string
+    {
+        Shifty::encipher($string, $cipherString='');
+        return $cipherString = Shifty::XORCipher($cipherString); 
+    }
+
+
+    private static function cipherOut($cipherString) : string
+    {
+        $cipherString = Shifty::XORCipher($cipherString);
+        Shifty::decipher($cipherString, $string ='');
+        return $string;
+    }
+
 
     /**
     * Return the logged in user.
@@ -49,22 +61,23 @@ class User {
         return $this->user;
     }
 
+
     /**
     * Login function
     * @param string $email User email.
     * @param string $password User password.
-    *
     * @return bool Returns login success.
     */
     public function login($email, $password)
     {
+        $email = User::cipherIn($email);
         if(is_null($this->pdo)) {
-            $this->msg = 'Connection failed, please contact IT support.';
+            $this->msg = 'Connection failed.';
             return false;
         } else {
             $pdo = $this->pdo;
-            $stmt = $pdo->prepare('SELECT id, first_name, last_name, email, failures, `password`, permission FROM users WHERE email = ? and confirmed = 1 limit 1');
-            $stmt->execute([$email]);
+            $stmt = $pdo->prepare("SELECT id, first_name, last_name, email, failures, password, permission FROM users WHERE email = '".$email."'");
+            $stmt->execute();
             $user = $stmt->fetch();
 
             if(password_verify($password, $user['password'])) {
@@ -72,13 +85,11 @@ class User {
                     $this->user = $user;
                     session_regenerate_id();
                     $_SESSION['user']['id'] = $user['id'];
-                    $_SESSION['user']['first_name'] = $user['first_name'];
-                    $_SESSION['user']['last_name'] = $user['last_name'];
-                    $_SESSION['user']['email'] = $user['email'];
                     $_SESSION['user']['permission'] = $user['permission'];
+                    header('Location: index.php');
                     return true;
                 } else {
-                    $this->msg = 'This user account is blocked, please contact IT support.';
+                    $this->msg = 'This user account is blocked.';
                     return false;
                 }
             } else {
@@ -88,6 +99,7 @@ class User {
             } 
         }
     }
+
 
     /**
     * Register a new user account function
@@ -109,11 +121,15 @@ class User {
             return false;
         }
 
+        $email = User::cipherIn($email);
+        $first_name = User::cipherIn($first_name);
+        $last_name = User::cipherIn($last_name);
+
         $password = $this->hashPass($password);
         $authCode = $this->hashPass(date('Y-m-d H:i:s').$email);
         $stmt = $pdo->prepare('INSERT INTO users (first_name, last_name, email, `password`, auth_code) VALUES (?, ?, ?, ?, ?)');
         if($stmt->execute([$first_name, $last_name, $email, $password, $authCode])) {
-            if($this->sendConfirmationEmail($email)) {
+            if($this->sendConfirmationEmail($email, $authCode)) {
                 return true;
             } else {
                 $this->msg = 'confirmation email sending has failed.';
@@ -125,34 +141,62 @@ class User {
         }
     }
 
+
     /**
     * Email the confirmation code function
     * @param string $email User email.
     * @return boolean of success.
     */
-    private function sendConfirmationEmail($email)
+    private function sendConfirmationEmail($email, $authCode)
     {
-        $pdo = $this->pdo;
-        $stmt = $pdo->prepare('SELECT confirm_code FROM users WHERE email = ? limit 1');
-        $stmt->execute([$email]);
-        $code = $stmt->fetch();
-
         $subject = "Activate your registration";
-        $message = "Click this link to activate you registration"."< \br>";
-        $message .= '<form method="post" name="acvtivationform" action="envirosample.online/index.php">';
-        $message .= '<input type="text" name="confirm_code" value="'.$code['confirm_code'].'" readonly>';
-        $message .= '<input type="submit" value="Activate">';
-        $message .= '</form>';
-        // $headers = 'X-Mailer: PHP/' . phpversion();
-        // Use below for local testing
-        $headers = 'From: local.dev.env@gmail.com' . "\r\n" . 'MIME-Version: 1.0' . "\r\n" . 'Content-type: text/html; charset=utf-8';
+        $message = ' 
+            <!DOCTYPE html> 
+            <head> 
+                <title>Welcome to envirosample.online</title> 
+            </head> 
+            <body> 
+                <h4>Thanks for joining us!</h4> 
+                <table rules="all" cellspacing="0" style="border: 2px;  border-color: #FB4314; width: 100%;"> 
+                    <tr style="background: rgb(139, 139, 139);"> 
+                        <td>
+                            <strong>Email from: </strong>
+                        </td>
+                        <td>
+                            admin@envirosample.online
+                        </td> 
+                    </tr> 
+                    <tr> 
+                        <td>
+                            <strong>Website: </strong>
+                        </td>
+                        <td>
+                            <a href="http://www.envirosample.online">www.envirosample.online</a>
+                        </td> 
+                    </tr>
+                    <tr>
+                        <td><strong>Click here to confirm your account: </strong></td>
+                        <td>
+                            <a href="login.manager.php?activity=activation.script&authCode='.$authCode.'"><strong>Confirm</strong></a>
+                        </td>
+                    </tr>
+                </table>
+            </body> 
+            </html>';
 
+        $from = "admin@envirosample.online";
+
+        $headers = "MIME-Version: 1.0" . "\r\n";
+        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+        $headers .= "From:" . $from;
+        $email = User::cipherOut($email);
         if(mail($email, $subject, $message, $headers)) {
             return true;
         } else {
             return false;
         }
     }
+
 
     /**
     * Activate a login by a confirmation code and login function
@@ -162,6 +206,7 @@ class User {
     */
     public function emailActivation($email, $authCode)
     {
+        $email = User::cipherIn($email);
         $pdo = $this->pdo;
         $stmt = $pdo->prepare('UPDATE users SET confirmed = 1 WHERE email = ? and auth_code = ?');
         $stmt->execute([$email, $authCode]);
@@ -176,11 +221,7 @@ class User {
             session_start();
             if(!empty($user['email'])) {
             	$_SESSION['user']['id'] = $user['id'];
-	            $_SESSION['user']['first_name'] = $user['first_name'];
-	            $_SESSION['user']['last_name'] = $user['last_name'];
-	            $_SESSION['user']['email'] = $user['email'];
                 $_SESSION['user']['permission'] = $user['permission'];
-                
                 return true;
             } else {
             	$this->msg = 'Account activitation failed.';
@@ -200,6 +241,7 @@ class User {
     */
     public function passwordChange($email, $oldPassword, $newPassword)
     {
+        $email = User::cipherIn($email);
         if(isset($email) && isset($oldPassword) && isset($newPassword)) {
             $pdo = $this->pdo;
             $stmt = $pdo->prepare('SELECT `password` FROM users WHERE email = ?');
@@ -223,12 +265,12 @@ class User {
 
 
     /**
-    * Assign a role function
+    * Assign a permission level function, default 1.
     * @param int $id User id.
     * @param int $role User role.
     * @return boolean of success.
     */
-    public function assignRole($id, $permission)
+    public function assignPermission($id, $permission)
     {
         $pdo = $this->pdo;
         if(isset($id) && isset($role)) {
@@ -265,10 +307,11 @@ class User {
                 return false;
             }
         } else {
-            $this->msg = 'Provide a valid data.';
+            $this->msg = 'Provide valid data.';
             return false;
         }
     }
+
 
     /**
     * Check if email is already used function
@@ -300,6 +343,7 @@ class User {
         $stmt->execute([$email]);
     }
 
+
     /**
     * Password hash function
     * @param string $password User password.
@@ -310,6 +354,7 @@ class User {
         return password_hash($password, PASSWORD_DEFAULT);
     }
 
+
     /**
     * Print error msg function
     * @return void.
@@ -318,6 +363,7 @@ class User {
     {
         print $this->msg;
     }
+
 
     /**
     * Logout the user and remove it from the session.
@@ -341,7 +387,7 @@ class User {
     public function listUsers()
     {
         if(is_null($this->pdo)) {
-            $this->msg = 'Connection did not work out!';
+            $this->msg = 'Connection failed!';
             return [];
         } else {
             $pdo = $this->pdo;

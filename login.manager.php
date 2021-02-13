@@ -5,8 +5,8 @@
 * @created 01/01/2021
 **/
 
-require_once('includes/config.php');
-require('includes/db.config.php');
+require_once('includes/login.config.php');
+require('includes/login.db.config.php');
 
 new LoginManager;
 
@@ -16,6 +16,7 @@ Class LoginManager {
 
 	public function __construct()
 	{
+		session_start();
 		$this->user = new User;
 		$this->loginHandler($_REQUEST);
 
@@ -48,12 +49,9 @@ Class LoginManager {
 					break;
 				case 'login':
 					if (isset($request['email']) && isset($request['password'])) {
-						$this->login($request['email'], $request['password']);
-						$this->displayPage($templateData, $page='userpage');
+						if($this->login($request['email'], $request['password'])) {
+						}
 					}
-					break;
-				case 'success':
-						header('Location: userpage.html');
 					break;
 				case 'logout':
 					$this->logout();
@@ -97,10 +95,10 @@ Class LoginManager {
 
 	private function register($email, $first_name, $last_name, $password)
 	{
-		$email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-		$first_name = filter_input(INPUT_POST, 'first_name', FILTER_SANITIZE_STRING);
-		$last_name = filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_STRING);
-		$password = filter_input(INPUT_POST, 'password', FILTER_DEFAULT);
+		$email = filter_var($email, FILTER_SANITIZE_EMAIL);
+		$first_name = filter_var($first_name, FILTER_SANITIZE_STRING);
+		$last_name = filter_var($last_name, FILTER_SANITIZE_STRING);
+		$password = filter_var($password, FILTER_DEFAULT);
 	
 		if($this->user->registration($email, $first_name, $last_name, $password)) {
 			print 'A confirmation mail has been sent, please confirm your account registration.';
@@ -114,8 +112,8 @@ Class LoginManager {
 
 	private function activateNew($email, $authCode)
 	{
-		$email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-		$code = filter_input(INPUT_POST, 'authCode', FILTER_DEFAULT);
+		$email = filter_var($email, FILTER_SANITIZE_EMAIL);
+		$code = filter_var($authCode, FILTER_DEFAULT);
 		
 		if($this->user->emailActivation($email, $code)) {
 			print 'Account activitation successful, login to continue.';
@@ -129,9 +127,8 @@ Class LoginManager {
 
 	private function login($email, $password)
 	{
-		$email = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_EMAIL);
-		$password = filter_input(INPUT_POST, 'password', FILTER_DEFAULT);
-	
+		$email = filter_var($email, FILTER_SANITIZE_EMAIL);
+		$password = filter_var($password, FILTER_DEFAULT);
 		if($this->user->login($email, $password)) {
 			return true;
 		} else {
@@ -152,8 +149,9 @@ Class LoginManager {
 
 	private function passwordChange($email, $oldPassword, $newPassword)
 	{
-		$email = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_EMAIL);
-		$password = filter_input(INPUT_POST, 'password', FILTER_DEFAULT);
+		$email = filter_input($username, FILTER_SANITIZE_EMAIL);
+		$oldPassword = filter_input($oldPassword, FILTER_DEFAULT);
+		$newPassword = filter_input($newPassword, FILTER_DEFAULT);
 
 		if($this->user->passwordChange($email, $oldPassword, $newPassword)) {
 			return true;
