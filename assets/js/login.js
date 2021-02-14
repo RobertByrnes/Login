@@ -28,7 +28,7 @@ $(function() {
 		if($("#useractivation").val() != "" && $("#activationcode").val() != "" && validateEmail($("#useractivation").val())){
 			$.ajax({
 			  method: "POST",
-			  url: "login.manager.php",
+			  url: "../../login.manager.php",
 			  data: { activity: 'activate', email: $("#useractivation").val(), authCode: $("#activationcode").val() }
 			}).done(function(msg) {
 				if(msg !== ""){
@@ -49,15 +49,14 @@ $(function() {
 		if($("#username").val() != "" && $("#password1").val() != "" && validateEmail($("#username").val())){
 			$.ajax({
 			  method: "POST",
-			  url: "login.manager.php",
+			  url: "../../login.manager.php",
 			  data: { activity: 'login', username: $("#username").val(), password: $("#password1").val() }
 			}).done(function(msg) {
 				if(msg !== ""){
 					alert(msg);
-				} else {
-					window.location = "login.manager.php?activity=success";
 				}
-			});
+					window.location = "index.php";
+			})
 		} else {
 			alert("Please fill all fields with valid data!");
 		}
@@ -70,7 +69,7 @@ $(function() {
 			if($("#password2").val() === $("#confirm-password").val()){
 				$.ajax({
 				  method: "POST",
-				  url: "login.manager.php",
+				  url: "../../login.manager.php",
 				  data: { activity: 'register', first_name: $("#first_name").val(), last_name: $("#last_name").val(), email: $("#email").val(), password: $("#password2").val() }
 				}).done(function(msg) {
 					   alert(msg);
@@ -91,7 +90,7 @@ $(function() {
 			if($("#password1").val() === $("#password2").val()){
 				$.ajax({
 				  method: "POST",
-				  url: "login.manager.php",
+				  url: "../../login.manager.php",
 				  data: { activity: 'change.password', email: $("#email").val(), oldPassword: $("#password2").val(), newPassword: $('#password3').val() }
 				}).done(function(msg) {
 					   alert(msg);

@@ -1,19 +1,37 @@
 <?php
 /**
 * Secure login/registration user class.
+* Set permitted attempts to resist brute force attacks
 */
 
 require_once('includes/login.db.config.php');
 require('Shifty.php');
 
 class User {
-    /** @var object $pdo Copy of PDO connection */
+    /**
+     * Copy of PDO connection.
+     * @var object $pdo
+     */
+
     private $pdo;
-    /** @var object of the logged in user */
+    /**
+     * Object of the logged in user.
+     * @var object
+     */
+
     private $user;
-    /** @var string error msg */
+
+    /**
+     * Variable holding error messages to login/registration attempts.
+     * @var string
+     */
     private $msg;
-    /** @var int number of permitted wrong login attemps */
+
+    /** 
+     * Number of permitted wrong login attemps,
+     * set lower to resist brute force attack.
+     * @var int
+     */
     private $permitedAttemps = 5;
 
 
@@ -22,7 +40,6 @@ class User {
     * @param string $dsn DB connection string.
     * @param string $user DB user.
     * @param string $pass DB password.
-    *
     * @return bool Returns connection success.
     */
     public function __construct()
@@ -37,17 +54,20 @@ class User {
         }
     }
 
+
     private static function cipherIn($string) : string
     {
-        Shifty::encipher($string, $cipherString='');
+        $cipherString ='';
+        Shifty::encipher($string, $cipherString);
         return $cipherString = Shifty::XORCipher($cipherString); 
     }
 
 
     private static function cipherOut($cipherString) : string
     {
+        $string ='';
         $cipherString = Shifty::XORCipher($cipherString);
-        Shifty::decipher($cipherString, $string ='');
+        Shifty::decipher($cipherString, $string);
         return $string;
     }
 
@@ -76,7 +96,7 @@ class User {
             return false;
         } else {
             $pdo = $this->pdo;
-            $stmt = $pdo->prepare("SELECT id, first_name, last_name, email, failures, password, permission FROM users WHERE email = '".$email."'");
+            $stmt = $pdo->prepare("SELECT id, failures, password, permission FROM users WHERE email = '".$email."'");
             $stmt->execute();
             $user = $stmt->fetch();
 
@@ -218,7 +238,7 @@ class User {
 
             $this->user = $user;
         
-            session_start();
+            session_regenerate_id();
             if(!empty($user['email'])) {
             	$_SESSION['user']['id'] = $user['id'];
                 $_SESSION['user']['permission'] = $user['permission'];
@@ -232,6 +252,7 @@ class User {
             return false;
         }
     }
+
 
     /**
     * Password change function

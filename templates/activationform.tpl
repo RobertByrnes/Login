@@ -7,10 +7,12 @@
             <div class="card-body justify-content-center">
 				<form method="post" action="?activity=activate">
 					<div class="row form-group justify-content-center">
-						<input type="text" name="email" id="useractivation" tabindex="3" class="form-control" placeholder="Email" value="" autocomplete="off">
+						<input type="text" name="email" id="useractivation" tabindex="3" class="form-control" placeholder="Enter email address and click activate." value="" autocomplete="off">
 					</div>
 					<div class="row form-group justify-content-center">
-						<input type="text" name="authCode" id="activationcode" tabindex="4" class="form-control" placeholder="Activation code" autocomplete="off">
+						<input type="text" name="authCode" id="activationcode" tabindex="4" class="form-control"
+							{if isset($templateData.authCode)} value="{$templateData.authCode}"{/if}
+							placeholder="Activation code" autocomplete="off">
 					</div>
 					<div class="row form-group justify-content-center">
 						<div class="row">

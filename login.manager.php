@@ -50,6 +50,7 @@ Class LoginManager {
 				case 'login':
 					if (isset($request['email']) && isset($request['password'])) {
 						if($this->login($request['email'], $request['password'])) {
+							header('Location: index.php');
 						}
 					}
 					break;
@@ -64,6 +65,9 @@ Class LoginManager {
 						$this->passwordChange($request['email'], $request['password']);
 						$this->displayPage($templateData, $page='userpage');
 					}
+					break;
+				case 'success':
+					header('Location: index.php');
 					break;
 				default:
 					$this->displayPage($templateData=array(), $page='login.registerform');
