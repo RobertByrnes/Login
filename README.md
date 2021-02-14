@@ -2,7 +2,7 @@
 This application, including classes and examples with PHP 7.4.9 request handler provides a secure login/user
 management system easily adapted to any code situation.
 
-PHP Tested: 5.6.19, 7.0.11, 7.4.9.fa-file
+PHP Tested: 5.6.19, 7.0.11, 7.4.9.
 
 The use case here is to include the this as a module in any project, configure index.php to test for $_SESSION['user'] - if this is not set then redirect to login.manager.php which will handle everything from there.  When an existing user is detected in session then a redirect will occur to index.php allowing the user to access the desired content.  What a user may access is set with the use of user permissions from the Class User. 
 
