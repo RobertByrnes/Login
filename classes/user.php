@@ -357,7 +357,7 @@ class User {
     * @param string $email User email.
     * @return void.
     */
-    private function registerWrongLoginAttemp($email)
+    private function registerWrongLoginAttempt($email)
     {
         $pdo = $this->pdo;
         $stmt = $pdo->prepare('UPDATE users SET failures = failures + 1 WHERE email = ?');
