@@ -17,8 +17,4 @@ node_modules
 /.vscode
 
 # General Files and Directories in Root
-login.sqp
 LICENSE
-README.md
-/example
-mail.php
