@@ -55,7 +55,6 @@ $(function() {
 				if(msg !== ""){
 					alert(msg);
 				}
-					window.location = "index.php";
 			})
 		} else {
 			alert("Please fill all fields with valid data!");

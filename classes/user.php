@@ -106,7 +106,7 @@ class User {
                     session_regenerate_id();
                     $_SESSION['user']['id'] = $user['id'];
                     $_SESSION['user']['permission'] = $user['permission'];
-                    header('Location: index.php');
+                    header("Location: ".$_SERVER['DOCUMENT_ROOT']."/Repositories/login/index.php");
                     return true;
                 } else {
                     $this->msg = 'This user account is blocked.';

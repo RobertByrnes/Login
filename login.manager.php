@@ -50,7 +50,7 @@ Class LoginManager {
 				case 'login':
 					if (isset($request['email']) && isset($request['password'])) {
 						if($this->login($request['email'], $request['password'])) {
-							header('Location: index.php');
+							header('Location: /index.php');
 						}
 					}
 					break;

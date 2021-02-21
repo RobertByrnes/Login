@@ -1,56 +1,29 @@
 <!doctype html>
-
 <head>
 </head>
-
 <body>
-
     <div class="container">
         <h2>Welcome
-            <?php print $_SESSION['user']['fname'].' '.$_SESSION['user']['lname']; ?>
+            <?php session_start(); print $_SESSION['user']['id'].' '.$_SESSION['user']['permission']; ?>
         </h2>
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Firstname</th>
-                    <th>Lastname</th>
-                    <th>Email</th>
+                    <th>User ID</th>
+                    <th>Permission Level</th>
                 </tr>
             </thead>
             <tbody>
-                <?php if($_SESSION['user']['user_role'] == 2){
-    	foreach ($vars as $user) {
-    	?>
                 <tr>
                     <td>
-                        <?=$user['fname']?>
+                        <?=$_SESSION['user']['id']?>
                     </td>
                     <td>
-                        <?=$user['lname']?>
-                    </td>
-                    <td>
-                        <?=$user['email']?>
+                        <?=$_SESSION['user']['permission']?>
                     </td>
                 </tr>
-                <?php
-    	}
-    }else{ ?>
-                <tr>
-                    <td>
-                        <?=$_SESSION['user']['fname']?>
-                    </td>
-                    <td>
-                        <?=$_SESSION['user']['lname']?>
-                    </td>
-                    <td>
-                        <?=$_SESSION['user']['email']?>
-                    </td>
-                </tr>
-                <?php } ?>
             </tbody>
         </table>
     </div>
-
 </body>
-
 </html>

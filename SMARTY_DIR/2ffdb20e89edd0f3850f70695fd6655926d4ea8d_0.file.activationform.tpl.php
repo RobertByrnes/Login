@@ -1,18 +1,18 @@
 <?php
-/* Smarty version 3.1.34-dev-7, created on 2021-02-14 14:18:03
+/* Smarty version 3.1.34-dev-7, created on 2021-02-14 19:28:13
   from 'C:\wamp64\www\Repositories\login\templates\activationform.tpl' */
 
 /* @var Smarty_Internal_Template $_smarty_tpl */
 if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   'version' => '3.1.34-dev-7',
-  'unifunc' => 'content_6029311bd117d5_41857869',
+  'unifunc' => 'content_602979cd77f754_09315168',
   'has_nocache_code' => false,
   'file_dependency' => 
   array (
     '2ffdb20e89edd0f3850f70695fd6655926d4ea8d' => 
     array (
       0 => 'C:\\wamp64\\www\\Repositories\\login\\templates\\activationform.tpl',
-      1 => 1613312282,
+      1 => 1613312331,
       2 => 'file',
     ),
   ),
@@ -20,7 +20,7 @@ if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   array (
   ),
 ),false)) {
-function content_6029311bd117d5_41857869 (Smarty_Internal_Template $_smarty_tpl) {
+function content_602979cd77f754_09315168 (Smarty_Internal_Template $_smarty_tpl) {
 ?><div class="row">
     <div class="col-lg-4 offset-lg-4 col-md-4 offset-md-4 col-sm-12 mt-5">
         <div class="card card-chart">
