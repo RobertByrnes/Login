@@ -4,7 +4,7 @@ management system easily adapted to any code situation.
 
 PHP Tested: 5.6.19, 7.0.11, 7.4.9.
 
-The use case here is to include the this as a module in any project, configure index.php to test for $_SESSION['user'] - if this is not set then redirect to login.manager.php which will handle everything from there.  When an existing user is detected in session then a redirect will occur to index.php allowing the user to access the desired content.  What a user may access is set with the use of user permissions from the Class User. 
+The use case here is to include the this as a module in any project, configure index.php to test for $_SESSION['user'] - if this is not set then redirect to login.manager.php which will handle everything from there.  When an existing user is detected in session then a redirect will occur back to index.php allowing the user to access the desired content.  What a user may access is set with the use of user permissions from Class User. 
 
 # Shifty Class
 The Shifty class handles the encryption and decryption of user information.  Shifty is a static class using strict data types. Everything stored in DB in this application goes through this class.  The primary method of enryption used for username and email data is a dual method - a substitution cypher followed up with an XOR encrpytion.  This is reversed in retrieval of data from the DB, there is much more to this class not used in this application but could easily be added.
@@ -45,7 +45,7 @@ This class contains function for user registration, activation, login and more. 
 		2.7. Shifty::hashGen()
 		2.8. Shifty::benchmarkServer()
 		2.9. Shifty::hashWithKnownCost()
-		2.10. SHifty::verifyByComparison()
+		2.10. Shifty::verifyByComparison()
 
 # Example Usage
 - Create a repository on your local machine called login.  Nagivate to login/login.manager.php

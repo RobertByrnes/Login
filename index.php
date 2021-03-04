@@ -1,11 +1,10 @@
+<?php session_start(); ?>
 <!doctype html>
 <head>
 </head>
 <body>
     <div class="container">
-        <h2>Welcome
-            <?php session_start(); print $_SESSION['user']['id'].' '.$_SESSION['user']['permission']; ?>
-        </h2>
+        <h2>Welcome...</h2>
         <table class="table table-striped">
             <thead>
                 <tr>
