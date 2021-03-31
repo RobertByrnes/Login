@@ -1,18 +1,18 @@
 <?php
-/* Smarty version 3.1.36, created on 2021-01-03 18:36:03
+/* Smarty version 3.1.34-dev-7, created on 2021-03-30 19:23:11
   from 'C:\wamp64\www\repositories\login\templates\header.tpl' */
 
 /* @var Smarty_Internal_Template $_smarty_tpl */
 if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
-  'version' => '3.1.36',
-  'unifunc' => 'content_5ff20e93d631d4_38599115',
+  'version' => '3.1.34-dev-7',
+  'unifunc' => 'content_60637a9fdd17c2_35859812',
   'has_nocache_code' => false,
   'file_dependency' => 
   array (
     'b935b835c01d0a432cf499d05d852c9a6a75101e' => 
     array (
       0 => 'C:\\wamp64\\www\\repositories\\login\\templates\\header.tpl',
-      1 => 1609698597,
+      1 => 1613238966,
       2 => 'file',
     ),
   ),
@@ -20,7 +20,7 @@ if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   array (
   ),
 ),false)) {
-function content_5ff20e93d631d4_38599115 (Smarty_Internal_Template $_smarty_tpl) {
+function content_60637a9fdd17c2_35859812 (Smarty_Internal_Template $_smarty_tpl) {
 ?><!DOCTYPE html>
 <html lang="en">
 
@@ -30,8 +30,8 @@ function content_5ff20e93d631d4_38599115 (Smarty_Internal_Template $_smarty_tpl)
     <title>Secure Login System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link href="assets/css/login.css" rel="stylesheet" />
-    <link href="assets/fontawesome/css/all.css" rel="stylesheet"/>
+    <link href="../assets/css/login.css" rel="stylesheet"/>
+    <link href="../assets/fontawesome/css/all.css" rel="stylesheet"/>
     <?php echo '<script'; ?>
  src="http://code.jquery.com/jquery-3.5.1.min.js"><?php echo '</script'; ?>
 >
@@ -42,13 +42,13 @@ function content_5ff20e93d631d4_38599115 (Smarty_Internal_Template $_smarty_tpl)
  src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"><?php echo '</script'; ?>
 >
     <?php echo '<script'; ?>
- src="assets/js/core/popper.min.js"><?php echo '</script'; ?>
+ src="../assets/js/core/popper.min.js"><?php echo '</script'; ?>
 >
     <?php echo '<script'; ?>
- src="assets/js/login.js" type="text/javascript"><?php echo '</script'; ?>
+ src="../assets/js/login.js" type="text/javascript"><?php echo '</script'; ?>
 >
     <?php echo '<script'; ?>
- src="assets/fontawesome/js/all.min.js" type="text/javascript"><?php echo '</script'; ?>
+ src="../assets/fontawesome/js/all.min.js" type="text/javascript"><?php echo '</script'; ?>
 >
 </head>
 

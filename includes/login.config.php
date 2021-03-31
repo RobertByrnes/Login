@@ -1,11 +1,8 @@
-<?php
-
+<?php // $smarty->testInstall();
 /**
  * @author Robert Byrnes
  * @created 01/01/2021
 **/
-
-// $smarty->testInstall();
 
 if (preg_match('/wamp64|repositories/i', $_SERVER['DOCUMENT_ROOT'])){
     define('SMARTY_DIR', '../shared/smarty/libs/');
@@ -34,11 +31,7 @@ if (preg_match('/wamp64|repositories/i', $_SERVER['DOCUMENT_ROOT'])) {
         }
         $file = str_replace('\\', DIRECTORY_SEPARATOR, $file);
         
-        if (file_exists($file)) {
-            include $file;
-        } else {
-            echo $file;
-        }
+        (file_exists($file)) ? include $file : print($file);
     });
 } else {
     spl_autoload_register(function($className) { 

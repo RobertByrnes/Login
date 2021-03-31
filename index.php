@@ -15,10 +15,20 @@
             <tbody>
                 <tr>
                     <td>
-                        <?=$_SESSION['user']['id']?>
+                        <?php
+                            if(isset($_SESSION['user']['id'])) {
+                                $_SESSION['user']['id'];
+                            } else {
+                                echo "No user session is set.  Use URL: login/login.manager.php for testing.";
+                            }
+                        ?>
                     </td>
                     <td>
-                        <?=$_SESSION['user']['permission']?>
+                        <?php
+                            if(isset($_SESSION['user']['permission'])) {
+                                $_SESSION['user']['permission'];
+                            }
+                        ?>
                     </td>
                 </tr>
             </tbody>

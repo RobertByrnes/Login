@@ -1,21 +1,23 @@
 <?php
+ require_once('includes/login.db.config.php');
+ require_once('Shifty.php');
 /**
 * Secure login/registration user class.
 * Set permitted attempts to resist brute force attacks
 */
 
-require_once('includes/login.db.config.php');
-require('Shifty.php');
-
 class User {
     /**
-     * Copy of PDO connection.
-     * @var object $pdo
+     * PDO object.
+     * 
+     * @var object
      */
 
     private $pdo;
+
     /**
      * Object of the logged in user.
+     * 
      * @var object
      */
 
@@ -23,6 +25,7 @@ class User {
 
     /**
      * Variable holding error messages to login/registration attempts.
+     * 
      * @var string
      */
     private $msg;
@@ -34,9 +37,9 @@ class User {
      */
     private $permitedAttemps = 5;
 
-
     /**
-    * Connection init function
+    * Class constructor.
+
     * @param string $dsn DB connection string.
     * @param string $user DB user.
     * @param string $pass DB password.
@@ -44,16 +47,19 @@ class User {
     */
     public function __construct()
     {
-        try {
+        try
+        {
             $pdo = new PDO(dsn, username, password);
             $this->pdo = $pdo;
-            return $this->pdo;
-        } catch(PDOException $e) { 
-            $this->msg = 'Connection to database failed!';
+            return true;
+        }
+
+        catch(PDOException $e)
+        { 
+            $this->msg = 'Database connection error.';
             return false;
         }
     }
-
 
     private static function cipherIn($string) : string
     {
@@ -61,7 +67,6 @@ class User {
         Shifty::encipher($string, $cipherString);
         return $cipherString = Shifty::XORCipher($cipherString); 
     }
-
 
     private static function cipherOut($cipherString) : string
     {
@@ -71,9 +76,9 @@ class User {
         return $string;
     }
 
-
     /**
     * Return the logged in user.
+
     * @return user array data
     */
     public function getUser()
@@ -81,62 +86,76 @@ class User {
         return $this->user;
     }
 
-
     /**
-    * Login function
+    * Login function.
+
     * @param string $email User email.
     * @param string $password User password.
-    * @return bool Returns login success.
+    * @return boolean Returns login success.
     */
-    public function login($email, $password)
+    public function login($email, $password) : boolean
     {
         $email = User::cipherIn($email);
-        if(is_null($this->pdo)) {
-            $this->msg = 'Connection failed.';
-            return false;
-        } else {
-            $pdo = $this->pdo;
-            $stmt = $pdo->prepare("SELECT id, failures, password, permission FROM users WHERE email = '".$email."'");
-            $stmt->execute();
-            $user = $stmt->fetch();
 
-            if(password_verify($password, $user['password'])) {
-                if($user['failures'] <= $this->permitedAttemps) {
+        if (is_null($this->pdo))
+        {
+            $this->msg = 'Database connection error.';
+            return false;
+        }
+
+        else
+        {
+            $stmt = $this->pdo->prepare("SELECT id, failures, password, permission FROM users WHERE email = '".$email."'");
+            $user = $stmt->execute()->fetch();
+
+            if (password_verify($password, $user['password']))
+            {
+                if($user['failures'] <= $this->permitedAttemps)
+                {
                     $this->user = $user;
-                    session_regenerate_id();
+                    (isset($_SESSION)) ? session_regenerate_id() : session_start();                    
                     $_SESSION['user']['id'] = $user['id'];
                     $_SESSION['user']['permission'] = $user['permission'];
-                    header("Location: ".$_SERVER['DOCUMENT_ROOT']."/Repositories/login/index.php");
                     return true;
-                } else {
+                }
+
+                else
+                {
                     $this->msg = 'This user account is blocked.';
                     return false;
                 }
-            } else {
+            }
+            
+            else
+            {
                 $this->registerWrongLoginAttemp($email);
-                $this->msg = 'Invalid login information or the account is not activated.';
+                $this->msg = 'Invalid login information or this account is not activated.';
                 return false;
             } 
         }
     }
 
-
     /**
-    * Register a new user account function
-    * @param string $email User email.
-    * @param string $first_name User first name.
-    * @param string $last_name User last name.
-    * @param string $password User password.
-    * @return boolean of success.
+    * Register a new user account and send a confirmation email.
+    *
+    * @param string $email
+    * @param string $fName
+    * @param string $lName
+    * @param string $password
+    * @return boolean
     */
-    public function registration($email, $first_name, $last_name, $password)
+    public function registration($email, $first_name, $last_name, $password) : boolean
     {
         $pdo = $this->pdo;
-        if($this->checkEmail($email)) {
+
+        if ($this->checkEmail($email))
+        {
             $this->msg = 'This email is already taken.';
             return false;
         }
-        if(!(isset($email) && isset($first_name) && isset($last_name) && isset($password) && filter_var($email, FILTER_VALIDATE_EMAIL))) {
+
+        if (!(isset($email) && isset($first_name) && isset($last_name) && isset($password) && filter_var($email, FILTER_VALIDATE_EMAIL)))
+        {
             $this->msg = 'All fields are required.';
             return false;
         }
@@ -144,26 +163,34 @@ class User {
         $email = User::cipherIn($email);
         $first_name = User::cipherIn($first_name);
         $last_name = User::cipherIn($last_name);
-
         $password = $this->hashPass($password);
         $authCode = $this->hashPass(date('Y-m-d H:i:s').$email);
         $stmt = $pdo->prepare('INSERT INTO users (first_name, last_name, email, `password`, auth_code) VALUES (?, ?, ?, ?, ?)');
-        if($stmt->execute([$first_name, $last_name, $email, $password, $authCode])) {
-            if($this->sendConfirmationEmail($email, $authCode)) {
+        
+        if ($stmt->execute([$first_name, $last_name, $email, $password, $authCode]))
+        {
+            if ($this->sendConfirmationEmail($email, $authCode))
+            {
                 return true;
-            } else {
+            }
+            
+            else
+            {
                 $this->msg = 'confirmation email sending has failed.';
                 return false; 
             }
-        } else {
+        }
+
+        else
+        {
             $this->msg = 'Adding new user failed.';
             return false;
         }
     }
 
-
     /**
-    * Email the confirmation code function
+    * Email the confirmation code function.
+    *
     * @param string $email User email.
     * @return boolean of success.
     */
@@ -205,21 +232,25 @@ class User {
             </html>';
 
         $from = "admin@envirosample.online";
-
         $headers = "MIME-Version: 1.0" . "\r\n";
         $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
         $headers .= "From:" . $from;
         $email = User::cipherOut($email);
-        if(mail($email, $subject, $message, $headers)) {
+        
+        if (mail($email, $subject, $message, $headers))
+        {
             return true;
-        } else {
+        }
+        
+        else
+        {
             return false;
         }
     }
 
-
     /**
-    * Activate a login by a confirmation code and login function
+    * Activate a login by a confirmation code and login function.
+    *
     * @param string $email User email.
     * @param string $confCode Confirmation code.
     * @return boolean of success.
@@ -231,28 +262,34 @@ class User {
         $stmt = $pdo->prepare('UPDATE users SET confirmed = 1 WHERE email = ? and auth_code = ?');
         $stmt->execute([$email, $authCode]);
 
-        if($stmt->rowCount()>0) {
+        if ($stmt->rowCount()>0)
+        {
             $stmt = $pdo->prepare('SELECT id, first_name, last_name, email, failures, permission FROM users WHERE email = ? and confirmed = 1 limit 1');
             $stmt->execute([$email]);
             $user = $stmt->fetch();
-
             $this->user = $user;
-        
             session_regenerate_id();
-            if(!empty($user['email'])) {
+            
+            if (!empty($user['email']))
+            {
             	$_SESSION['user']['id'] = $user['id'];
                 $_SESSION['user']['permission'] = $user['permission'];
                 return true;
-            } else {
+            }
+            
+            else
+            {
             	$this->msg = 'Account activitation failed.';
             	return false;
             }            
-        } else {
+        }
+        
+        else
+        {
             $this->msg = 'Account activitation failed.';
             return false;
         }
     }
-
 
     /**
     * Password change function
@@ -263,27 +300,37 @@ class User {
     public function passwordChange($email, $oldPassword, $newPassword)
     {
         $email = User::cipherIn($email);
-        if(isset($email) && isset($oldPassword) && isset($newPassword)) {
+        
+        if (isset($email) && isset($oldPassword) && isset($newPassword))
+        {
             $pdo = $this->pdo;
             $stmt = $pdo->prepare('SELECT `password` FROM users WHERE email = ?');
             $stmt->execute([$email]);
             $user = $stmt->fetch();
 
-            if(password_verify($oldPassword, $user['password'])) {
+            if (password_verify($oldPassword, $user['password']))
+            {
                 $stmt = $pdo->prepare('UPDATE users SET password = ? WHERE email = ?');
-                if($stmt->execute([$email, $this->hashPass($newPassword)])) {
+                
+                if ($stmt->execute([$email, $this->hashPass($newPassword)]))
+                {
                     return true;
-                } else {
+                }
+                
+                else
+                {
                     $this->msg = 'Password change failed.';
                     return false;
                 }
-            } else {
+            }
+            
+            else
+            {
                 $this->msg = 'Provide a valid email address and a ensure old passwords match.';
                 return false;
             }
         }
     }
-
 
     /**
     * Assign a permission level function, default 1.
@@ -294,20 +341,29 @@ class User {
     public function assignPermission($id, $permission)
     {
         $pdo = $this->pdo;
-        if(isset($id) && isset($role)) {
+
+        if (isset($id) && isset($role))
+        {
             $stmt = $pdo->prepare('UPDATE users SET permission = ? WHERE id = ?');
-            if($stmt->execute([$permission, $role])) {
+            
+            if ($stmt->execute([$permission, $role]))
+            {
                 return true;
-            } else {
+            }
+            
+            else
+            {
                 $this->msg = 'Permission assignment failed.';
                 return false;
             }
-        } else {
+        }
+        
+        else
+        {
             $this->msg = 'Provide a permission level for this user.';
             return false;
         }
     }
-
 
     /**
     * User information change function
@@ -319,20 +375,27 @@ class User {
     public function userUpdate($id, $first_name, $last_name)
     {
         $pdo = $this->pdo;
-        if(isset($id) && isset($first_name) && isset($last_name)) {
+        if (isset($id) && isset($first_name) && isset($last_name))
+        {
             $stmt = $pdo->prepare('UPDATE users SET first_name = ?, last_name = ? WHERE id = ?');
+            
             if($stmt->execute([$id,$first_name,$last_name])) {
                 return true;
-            } else {
+            }
+            
+            else
+            {
                 $this->msg = 'User information change failed.';
                 return false;
             }
-        } else {
+        }
+        
+        else
+        {
             $this->msg = 'Provide valid data.';
             return false;
         }
     }
-
 
     /**
     * Check if email is already used function
@@ -344,29 +407,31 @@ class User {
         $pdo = $this->pdo;
         $stmt = $pdo->prepare('SELECT id FROM users WHERE email = ? limit 1');
         $stmt->execute([$email]);
-        if($stmt->rowCount() > 0) {
+        
+        if ($stmt->rowCount() > 0)
+        {
             return true;
-        } else {
+        }
+        
+        else
+        {
             return false;
         }
     }
-
 
     /**
     * Register a wrong login attemp function
     * @param string $email User email.
     * @return void.
     */
-    private function registerWrongLoginAttempt($email)
+    private function registerWrongLoginAttempt($email) : void
     {
-        $pdo = $this->pdo;
-        $stmt = $pdo->prepare('UPDATE users SET failures = failures + 1 WHERE email = ?');
+        $stmt = $this->pdo->prepare('UPDATE users SET failures = failures + 1 WHERE email = ?');
         $stmt->execute([$email]);
     }
 
-
     /**
-    * Password hash function
+    * Password hash function.
     * @param string $password User password.
     * @return string $password Hashed password.
     */
@@ -374,7 +439,6 @@ class User {
     {
         return password_hash($password, PASSWORD_DEFAULT);
     }
-
 
     /**
     * Print error msg function
@@ -385,10 +449,8 @@ class User {
         print $this->msg;
     }
 
-
     /**
     * Logout the user and remove it from the session.
-    *
     * @return true
     */
     public function logout()
@@ -398,19 +460,20 @@ class User {
         return true;
     }
 
-
-
     /**
-    * List users function
-    *
+    * Returns an array of all user details.
     * @return array Returns list of users.
     */
-    public function listUsers()
+    public function listUsers() : array
     {
-        if(is_null($this->pdo)) {
+        if (is_null($this->pdo))
+        {
             $this->msg = 'Connection failed!';
             return [];
-        } else {
+        }
+        
+        else
+        {
             $pdo = $this->pdo;
             $stmt = $pdo->prepare('SELECT id, first_name, last_name, email FROM users WHERE confirmed = 1');
             $stmt->execute();

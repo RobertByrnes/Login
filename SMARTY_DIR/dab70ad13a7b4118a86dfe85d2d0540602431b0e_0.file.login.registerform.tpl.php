@@ -1,18 +1,18 @@
 <?php
-/* Smarty version 3.1.36, created on 2021-01-03 18:45:04
+/* Smarty version 3.1.34-dev-7, created on 2021-03-30 19:20:39
   from 'C:\wamp64\www\repositories\login\templates\login.registerform.tpl' */
 
 /* @var Smarty_Internal_Template $_smarty_tpl */
 if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
-  'version' => '3.1.36',
-  'unifunc' => 'content_5ff210b03c5694_58954244',
+  'version' => '3.1.34-dev-7',
+  'unifunc' => 'content_60637a07905761_19501355',
   'has_nocache_code' => false,
   'file_dependency' => 
   array (
     'dab70ad13a7b4118a86dfe85d2d0540602431b0e' => 
     array (
       0 => 'C:\\wamp64\\www\\repositories\\login\\templates\\login.registerform.tpl',
-      1 => 1609699352,
+      1 => 1609701874,
       2 => 'file',
     ),
   ),
@@ -20,7 +20,7 @@ if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   array (
   ),
 ),false)) {
-function content_5ff210b03c5694_58954244 (Smarty_Internal_Template $_smarty_tpl) {
+function content_60637a07905761_19501355 (Smarty_Internal_Template $_smarty_tpl) {
 ?><div class="row">
     <div class="col-lg-4 offset-lg-2 col-md-4 offset-md-2 col-sm-12 mt-5">
         <div class="card card-chart">
