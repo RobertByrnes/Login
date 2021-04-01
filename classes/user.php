@@ -1,6 +1,5 @@
 <?php
- require_once('includes/login.db.config.php');
- require_once('Shifty.php');
+ 
 /**
 * Secure login/registration user class.
 * Set permitted attempts to resist brute force attacks
@@ -56,7 +55,7 @@ class User {
 
         catch(PDOException $e)
         { 
-            $this->msg = 'Database connection error.';
+            $this->msg = 'Database connection error: '.$e;
             return false;
         }
     }

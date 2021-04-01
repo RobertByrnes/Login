@@ -2,7 +2,7 @@
 session_start();
 require_once('includes/login.config.php');
 require_once('includes/login.db.config.php');
-
+require __DIR__ . '/vendor/autoload.php';
 
 /**
 * Class LoginManager, validates and routes user requests to Class User. 

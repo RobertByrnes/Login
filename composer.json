@@ -1,0 +1,11 @@
+{
+    "name": "robertbyrnes/login",
+    "description": "PHP login script",
+    "require": {
+    },
+    "autoload": {
+        "psr-4": {
+            "": "classes/"
+        }
+    }
+}
