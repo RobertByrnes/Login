@@ -2,7 +2,7 @@
     "name": "robertbyrnes/login",
     "description": "PHP login script",
     "version": "1.0",
-    "license": "GNU General Public License v3.0",
+    "license": "GPL-3.0-or-later",
     "require": {
         "robertbyrnes/dataconnection": "^1.0"
     },
