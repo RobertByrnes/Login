@@ -1,18 +1,16 @@
 <?php
- 
-/**
-* Secure login/registration user class.
-* Set permitted attempts to resist brute force attacks
-*/
+require __DIR__ . '\..\vendor\autoload.php';
 
-class User {
+class User extends DataConnection
+{
+    use Email_Message;
+
     /**
-     * PDO object.
-     * 
-     * @var object
+     * Number of permitted login attempt allowed before a user account is locked.
+     *
+     *@var const
      */
-
-    private $pdo;
+    const ATTEMPTS = 5;
 
     /**
      * Object of the logged in user.
@@ -20,21 +18,16 @@ class User {
      * @var object
      */
 
-    private $user;
+    private object $user;
 
     /**
-     * Variable holding error messages to login/registration attempts.
+     * Variable holding error userMessages to login/registration attempts.
      * 
      * @var string
      */
-    private $msg;
+    public string $userMessage;
 
-    /** 
-     * Number of permitted wrong login attemps,
-     * set lower to resist brute force attack.
-     * @var int
-     */
-    private $permitedAttemps = 5;
+    private string $srcEmail;
 
     /**
     * Class constructor.
@@ -44,35 +37,10 @@ class User {
     * @param string $pass DB password.
     * @return bool Returns connection success.
     */
-    public function __construct()
+    public function __construct(string $email)
     {
-        try
-        {
-            $pdo = new PDO(dsn, username, password);
-            $this->pdo = $pdo;
-            return true;
-        }
-
-        catch(PDOException $e)
-        { 
-            $this->msg = 'Database connection error: '.$e;
-            return false;
-        }
-    }
-
-    private static function cipherIn($string) : string
-    {
-        $cipherString ='';
-        Shifty::encipher($string, $cipherString);
-        return $cipherString = Shifty::XORCipher($cipherString); 
-    }
-
-    private static function cipherOut($cipherString) : string
-    {
-        $string ='';
-        $cipherString = Shifty::XORCipher($cipherString);
-        Shifty::decipher($cipherString, $string);
-        return $string;
+        $this->srcEmail = $email;
+        PARENT::__construct();
     }
 
     /**
@@ -88,48 +56,52 @@ class User {
     /**
     * Login function.
 
-    * @param string $email User email.
-    * @param string $password User password.
-    * @return boolean Returns login success.
+    * @param string $email
+    * @param string $password
+    * @return bool
     */
-    public function login($email, $password) : boolean
+    public function login(string $email, string $password) : bool
     {
-        $email = User::cipherIn($email);
-
-        if (is_null($this->pdo))
+        $email = filter_var($email, FILTER_SANITIZE_EMAIL);
+		$password = filter_var($password, FILTER_DEFAULT);
+        if (is_null($this->dB))
         {
-            $this->msg = 'Database connection error.';
-            return false;
+            $this->userMessage = $this->message;
+            return FALSE;
         }
 
         else
         {
-            $stmt = $this->pdo->prepare("SELECT id, failures, password, permission FROM users WHERE email = '".$email."'");
-            $user = $stmt->execute()->fetch();
+            $user = $this->preparedQueryRow("SELECT id, failures, password, permission, confirmed FROM `users` WHERE email=:email", array('email' => $email));
 
-            if (password_verify($password, $user['password']))
+            if (isset($user->password) && password_verify($password, $user->password))
             {
-                if($user['failures'] <= $this->permitedAttemps)
+                if ($user->confirmed === 0)
+                {
+                    $this->userMessage = "This account has not been authenticated.";
+                    return FALSE;
+                }
+
+                if($user->failures <= SELF::ATTEMPTS)
                 {
                     $this->user = $user;
                     (isset($_SESSION)) ? session_regenerate_id() : session_start();                    
-                    $_SESSION['user']['id'] = $user['id'];
-                    $_SESSION['user']['permission'] = $user['permission'];
-                    return true;
+                    $_SESSION['user']['id'] = $this->user->id;
+                    $_SESSION['user']['permission'] = $this->user->permission;
+                    $this->userMessage = 'Login successful.';
+                    return TRUE;
                 }
-
                 else
                 {
-                    $this->msg = 'This user account is blocked.';
-                    return false;
+                    $this->userMessage = 'This user is blocked.';
+                    return FALSE;
                 }
-            }
-            
+            } 
             else
             {
-                $this->registerWrongLoginAttemp($email);
-                $this->msg = 'Invalid login information or this account is not activated.';
-                return false;
+                $this->registerWrongLoginAttempt($email);
+                $this->userMessage = 'Invalid login information.';
+                return FALSE;
             } 
         }
     }
@@ -141,343 +113,318 @@ class User {
     * @param string $fName
     * @param string $lName
     * @param string $password
-    * @return boolean
+    * @return bool
     */
-    public function registration($email, $first_name, $last_name, $password) : boolean
+    public function registration(string $email, string $fName, string $lName, string $password) : bool
     {
-        $pdo = $this->pdo;
-
         if ($this->checkEmail($email))
         {
-            $this->msg = 'This email is already taken.';
-            return false;
+            $this->userMessage = 'This email is already taken.';
+            return FALSE;
         }
 
-        if (!(isset($email) && isset($first_name) && isset($last_name) && isset($password) && filter_var($email, FILTER_VALIDATE_EMAIL)))
+        if (!(isset($email) || !isset($fName) || !isset($lName) || !isset($password) || !filter_var($email, FILTER_VALIDATE_EMAIL)))
         {
-            $this->msg = 'All fields are required.';
-            return false;
+            $this->userMessage = 'All fields are required.';
+            return FALSE;
         }
 
-        $email = User::cipherIn($email);
-        $first_name = User::cipherIn($first_name);
-        $last_name = User::cipherIn($last_name);
-        $password = $this->hashPass($password);
-        $authCode = $this->hashPass(date('Y-m-d H:i:s').$email);
-        $stmt = $pdo->prepare('INSERT INTO users (first_name, last_name, email, `password`, auth_code) VALUES (?, ?, ?, ?, ?)');
-        
-        if ($stmt->execute([$first_name, $last_name, $email, $password, $authCode]))
+        $authCode = md5(date('YmdHis'));
+        $userDetails = array(
+            'fName'     => $fName,
+            'lName'     => $lName,
+            'email'     => $email,
+            'password'  => password_hash($password, PASSWORD_ARGON2I),
+            'code'      => $authCode
+        );
+
+        $outcome = $this->preparedInsert("INSERT INTO users (first_name, last_name, email, `password`, auth_code) VALUES (:fName, :lName, :email, :password, :code)", $userDetails);
+
+        if ($outcome)
         {
             if ($this->sendConfirmationEmail($email, $authCode))
             {
-                return true;
-            }
-            
+                $this->userMessage = 'Adding this user was a success, a confirmation email has been sent.';
+                return TRUE;
+            }        
             else
             {
-                $this->msg = 'confirmation email sending has failed.';
-                return false; 
+                $this->userMessage = 'Adding this user was a success but the email did not send.';
+                return FALSE; 
             }
         }
-
         else
         {
-            $this->msg = 'Adding new user failed.';
-            return false;
+            $this->userMessage = 'Adding new user failed.';
+            return FALSE;
         }
     }
 
     /**
     * Email the confirmation code function.
     *
-    * @param string $email User email.
-    * @return boolean of success.
+    * @param string $email
+    * @return bool
     */
-    private function sendConfirmationEmail($email, $authCode)
+    private function sendConfirmationEmail(string $email, string $authCode) : bool
     {
-        $subject = "Activate your registration";
-        $message = ' 
-            <!DOCTYPE html> 
-            <head> 
-                <title>Welcome to envirosample.online</title> 
-            </head> 
-            <body> 
-                <h4>Thanks for joining us!</h4> 
-                <table rules="all" cellspacing="0" style="border: 2px;  border-color: #FB4314; width: 100%;"> 
-                    <tr style="background: rgb(139, 139, 139);"> 
-                        <td>
-                            <strong>Email from: </strong>
-                        </td>
-                        <td>
-                            admin@envirosample.online
-                        </td> 
-                    </tr> 
-                    <tr> 
-                        <td>
-                            <strong>Website: </strong>
-                        </td>
-                        <td>
-                            <a href="http://www.envirosample.online">www.envirosample.online</a>
-                        </td> 
-                    </tr>
-                    <tr>
-                        <td><strong>Click here to confirm your account: </strong></td>
-                        <td>
-                            <a href="login.manager.php?activity=activation.script&authCode='.$authCode.'"><strong>Confirm</strong></a>
-                        </td>
-                    </tr>
-                </table>
-            </body> 
-            </html>';
-
-        $from = "admin@envirosample.online";
-        $headers = "MIME-Version: 1.0" . "\r\n";
-        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-        $headers .= "From:" . $from;
-        $email = User::cipherOut($email);
-        
-        if (mail($email, $subject, $message, $headers))
+        $subject  = "Activate your registration";
+        $userMessage  = $this->confirmationEmailTemplate($authCode);
+        $headers  = "MIME-Version: 1.0"."\r\n";
+        $headers .= "Content-type:text/html;charset=UTF-8"."\r\n";
+        $headers .= "From: local.dev.env@gmail.com";
+        $email    = $email;
+        if (mail($email, $subject, $userMessage, $headers))
         {
-            return true;
+            return TRUE;
         }
         
         else
         {
-            return false;
+            return FALSE;
         }
     }
 
     /**
     * Activate a login by a confirmation code and login function.
     *
-    * @param string $email User email.
-    * @param string $confCode Confirmation code.
-    * @return boolean of success.
+    * @param string $email
+    * @param string $authCode
+    * @return bool
     */
-    public function emailActivation($email, $authCode)
+    public function emailActivation(string $email, string $authCode) : bool
     {
-        $email = User::cipherIn($email);
-        $pdo = $this->pdo;
-        $stmt = $pdo->prepare('UPDATE users SET confirmed = 1 WHERE email = ? and auth_code = ?');
-        $stmt->execute([$email, $authCode]);
+        $userDetails = array(
+            'email'     => $email,
+            'auth_code' => $authCode
+        );
+        $count = $this->preparedInsertGetCount("UPDATE users SET confirmed = 1 WHERE email=:email AND auth_code=:auth_code", $userDetails);
 
-        if ($stmt->rowCount()>0)
+        if ($count>0)
         {
-            $stmt = $pdo->prepare('SELECT id, first_name, last_name, email, failures, permission FROM users WHERE email = ? and confirmed = 1 limit 1');
-            $stmt->execute([$email]);
-            $user = $stmt->fetch();
-            $this->user = $user;
-            session_regenerate_id();
+            $this->user = $this->preparedQueryRow("SELECT id, permission FROM users WHERE email=:email and confirmed = 1", array('email' => $email));
+            session_start();
             
-            if (!empty($user['email']))
+            if (isset($this->user->id) && !empty($this->user->id))
             {
-            	$_SESSION['user']['id'] = $user['id'];
-                $_SESSION['user']['permission'] = $user['permission'];
-                return true;
+            	$_SESSION['user']['id'] = $this->user->id;
+                $_SESSION['user']['permission'] = $this->user->permission;
+                $this->message = 'Account activated successfully.';
+                return TRUE;
             }
             
             else
             {
-            	$this->msg = 'Account activitation failed.';
-            	return false;
+            	$this->userMessage = 'Account activitation failed.';
+            	return FALSE;
             }            
         }
         
         else
         {
-            $this->msg = 'Account activitation failed.';
-            return false;
+            $this->userMessage = 'Account activitation failed.';
+            return FALSE;
         }
     }
 
     /**
-    * Password change function
-    * @param int $id User id.
-    * @param string $password New password.
-    * @return boolean of success.
+    * Password change function.
+    *
+    * @param string $email
+    * @param string $oldPassword
+    * @param string $newPassword
+    * @return bool
     */
-    public function passwordChange($email, $oldPassword, $newPassword)
+    public function passwordChange($email, $oldPassword, $newPassword) : bool
     {
-        $email = User::cipherIn($email);
         
+		$email = filter_input($username, FILTER_SANITIZE_EMAIL);
+		$oldPassword = filter_input($oldPassword, FILTER_DEFAULT);
+		$newPassword = filter_input($newPassword, FILTER_DEFAULT);
         if (isset($email) && isset($oldPassword) && isset($newPassword))
         {
-            $pdo = $this->pdo;
-            $stmt = $pdo->prepare('SELECT `password` FROM users WHERE email = ?');
-            $stmt->execute([$email]);
-            $user = $stmt->fetch();
+            $this->user = $this->preparedQueryRow("SELECT `password` FROM users WHERE email=:email", array('email' => $email));
 
-            if (password_verify($oldPassword, $user['password']))
+            if (password_verify($oldPassword, $this->user->password))
             {
-                $stmt = $pdo->prepare('UPDATE users SET password = ? WHERE email = ?');
+                $userUpdate = array(
+                    'password'  => password_hash($newPassword, PASSWORD_ARGON2I),
+                    'email'     => $email
+                );
+                $count = $this->preparedInsertGetCount("UPDATE users SET password=:password WHERE email=:email", $userUpdate);
                 
-                if ($stmt->execute([$email, $this->hashPass($newPassword)]))
+                if ($count>0)
                 {
-                    return true;
-                }
-                
+                    $this->userMessage = 'Password changed successfully.';
+                    return TRUE;
+                }                
                 else
                 {
-                    $this->msg = 'Password change failed.';
-                    return false;
+                    $this->userMessage = 'Password change failed.';
+                    return FALSE;
                 }
-            }
-            
+            }           
             else
             {
-                $this->msg = 'Provide a valid email address and a ensure old passwords match.';
-                return false;
+                $this->userMessage = 'Passwords did not match. Try again ensuring both passwords match.';
+                return FALSE;
             }
         }
     }
 
     /**
-    * Assign a permission level function, default 1.
-    * @param int $id User id.
-    * @param int $role User role.
-    * @return boolean of success.
+    * Assign permission level for a user, default.
+    *
+    * @param int $id
+    * @param int $permission
+    * @return bool
     */
-    public function assignPermission($id, $permission)
+    public function assignPermission($id, $permission) : bool
     {
-        $pdo = $this->pdo;
-
-        if (isset($id) && isset($role))
+        if (isset($id) && isset($permission))
         {
-            $stmt = $pdo->prepare('UPDATE users SET permission = ? WHERE id = ?');
+            $count = $this->preparedInsertGetCount("UPDATE users SET permission = $permission WHERE id = $id");
             
-            if ($stmt->execute([$permission, $role]))
+            if ($count > 0)
             {
-                return true;
+                $this->userMessage = 'User permission level has been set to '.$permission;
+                return TRUE;
             }
             
             else
             {
-                $this->msg = 'Permission assignment failed.';
-                return false;
+                $this->userMessage = 'Permission assignment failed.';
+                return FALSE;
             }
         }
         
         else
         {
-            $this->msg = 'Provide a permission level for this user.';
-            return false;
+            $this->userMessage = 'A permission level for this user must be provided.';
+            return FALSE;
         }
     }
 
     /**
     * User information change function
-    * @param int $id User id.
-    * @param string $first_name User first name.
-    * @param string $last_name User last name.
-    * @return boolean of success.
+    *
+    * @param int $id
+    * @param string $fName
+    * @param string $lName
+    * @return bool
     */
-    public function userUpdate($id, $first_name, $last_name)
+    public function userUpdate($id, $fName, $lName)
     {
-        $pdo = $this->pdo;
-        if (isset($id) && isset($first_name) && isset($last_name))
+        if (isset($id) && isset($fName) && isset($lName))
         {
-            $stmt = $pdo->prepare('UPDATE users SET first_name = ?, last_name = ? WHERE id = ?');
+            $userDetails = array(
+                'id'        => $id,
+                'fName'     => $fName,
+                'lName'     => $lName
+            );
+            $count = $this->preparedInsertGetCount("UPDATE users SET first_name=:fName, last_name=:lName WHERE id=:id", $userDetails);
             
-            if($stmt->execute([$id,$first_name,$last_name])) {
-                return true;
+            if($count)
+            {
+                $this->userMessage = 'User information changed.';
+                return TRUE;
             }
             
             else
             {
-                $this->msg = 'User information change failed.';
-                return false;
+                $this->userMessage = 'User information change failed.';
+                return FALSE;
             }
         }
         
         else
         {
-            $this->msg = 'Provide valid data.';
-            return false;
+            $this->userMessage = 'Provide valid data.';
+            return FALSE;
         }
     }
 
     /**
-    * Check if email is already used function
-    * @param string $email User email.
-    * @return boolean of success.
+    * Check if email is already used function.
+    *
+    * @param string $email
+    * @return bool
     */
-    private function checkEmail($email)
+    private function checkEmail($email) : bool
     {
-        $pdo = $this->pdo;
-        $stmt = $pdo->prepare('SELECT id FROM users WHERE email = ? limit 1');
-        $stmt->execute([$email]);
-        
-        if ($stmt->rowCount() > 0)
+        $count = $this->preparedQueryRow("SELECT id FROM users WHERE email=:email", array('email' => $email));
+
+        if ($count > 0)
         {
-            return true;
+            $this->userMessage = 'This email address is already in use.';
+            return TRUE;
         }
         
         else
         {
-            return false;
+            $this->userMessage = 'This email address is available.';
+            return FALSE;
         }
     }
 
     /**
-    * Register a wrong login attemp function
-    * @param string $email User email.
-    * @return void.
+    * Register a wrong login attemp function.
+    *
+    * @param string $email
+    * @return bool
     */
-    private function registerWrongLoginAttempt($email) : void
+    private function registerWrongLoginAttempt($email) : bool
     {
-        $stmt = $this->pdo->prepare('UPDATE users SET failures = failures + 1 WHERE email = ?');
-        $stmt->execute([$email]);
+        $result = $this->preparedInsert("UPDATE users SET failures = failures + 1 WHERE email = '".$email."'");
+        if ($result)
+        {
+            return TRUE;
+        }
+        else
+        {
+            return FALSE;
+        }
     }
 
     /**
-    * Password hash function.
-    * @param string $password User password.
-    * @return string $password Hashed password.
+    * Returns the userMessage currently held by an object of this class.
+    *
+    * @return string
     */
-    private function hashPass($password)
+    public function getuserMessage() : string
     {
-        return password_hash($password, PASSWORD_DEFAULT);
+        return $this->userMessage;
     }
 
     /**
-    * Print error msg function
-    * @return void.
+    * Log the user out and remove the user from session.
+    * @return bool
     */
-    public function printMsg()
+    public function logout() : bool
     {
-        print $this->msg;
+        $_SESSION['user'] = NULL;
+        $this->userMessage = 'User logged out.';
+        return TRUE;
     }
 
     /**
-    * Logout the user and remove it from the session.
-    * @return true
-    */
-    public function logout()
-    {
-        $_SESSION['user'] = null;
-        session_regenerate_id();
-        return true;
-    }
-
-    /**
-    * Returns an array of all user details.
-    * @return array Returns list of users.
+    * Returns an array of all user details
+    *
+    * @return array
     */
     public function listUsers() : array
     {
-        if (is_null($this->pdo))
+        $users = array();
+        if (is_null($this->dB))
         {
-            $this->msg = 'Connection failed!';
-            return [];
+            $this->userMessage = 'Database connection failed.';
+            return $users;
         }
-        
         else
         {
-            $pdo = $this->pdo;
-            $stmt = $pdo->prepare('SELECT id, first_name, last_name, email FROM users WHERE confirmed = 1');
-            $stmt->execute();
-            $result = $stmt->fetchAll(); 
-            return $result; 
+            $users = $this->preparedQueryMany("SELECT id, first_name, last_name, email FROM users WHERE confirmed=1", NULL);
+            $this->userMessage = 'User list has been generated.';
+            return $users; 
         }
     }
 }

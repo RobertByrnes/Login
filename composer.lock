@@ -4,8 +4,37 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a2cf967cdab48f99911ed4862984e1bb",
-    "packages": [],
+    "content-hash": "edf3b801e6e45688329fe3eb54489ab6",
+    "packages": [
+        {
+            "name": "robertbyrnes/dataconnection",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/RobertByrnes/DataConnection.git",
+                "reference": "1958f973f1071ab3c5d14d3bebdff1f3a2857a7c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/RobertByrnes/DataConnection/zipball/1958f973f1071ab3c5d14d3bebdff1f3a2857a7c",
+                "reference": "1958f973f1071ab3c5d14d3bebdff1f3a2857a7c",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "": "classes/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Database connection dependency using PDO for PHP 7^.",
+            "support": {
+                "issues": "https://github.com/RobertByrnes/DataConnection/issues",
+                "source": "https://github.com/RobertByrnes/DataConnection/tree/1.0"
+            },
+            "time": "2021-04-04T15:58:04+00:00"
+        }
+    ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",

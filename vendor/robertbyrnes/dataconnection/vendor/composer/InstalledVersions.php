@@ -25,33 +25,24 @@ class InstalledVersions
 private static $installed = array (
   'root' => 
   array (
-    'pretty_version' => 'dev-master',
-    'version' => 'dev-master',
+    'pretty_version' => 'dev-main',
+    'version' => 'dev-main',
     'aliases' => 
     array (
     ),
-    'reference' => '71611544e6d8ce2ab9cb47b52f54989d28a9b0d8',
-    'name' => 'robertbyrnes/login',
+    'reference' => '323d7f07838d9d68baa59ac7f59695f8fc6d8924',
+    'name' => 'robertbyrnes/dataconnection',
   ),
   'versions' => 
   array (
     'robertbyrnes/dataconnection' => 
     array (
-      'pretty_version' => '1.0',
-      'version' => '1.0.0.0',
+      'pretty_version' => 'dev-main',
+      'version' => 'dev-main',
       'aliases' => 
       array (
       ),
-      'reference' => '1958f973f1071ab3c5d14d3bebdff1f3a2857a7c',
-    ),
-    'robertbyrnes/login' => 
-    array (
-      'pretty_version' => 'dev-master',
-      'version' => 'dev-master',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '71611544e6d8ce2ab9cb47b52f54989d28a9b0d8',
+      'reference' => '323d7f07838d9d68baa59ac7f59695f8fc6d8924',
     ),
   ),
 );

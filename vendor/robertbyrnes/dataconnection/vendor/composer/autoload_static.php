@@ -4,11 +4,10 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInite989f021b5763cd61dc0305d5c48b528
+class ComposerStaticInit0d986fb979808e8b7c21735cde038d5e
 {
     public static $fallbackDirsPsr4 = array (
         0 => __DIR__ . '/../..' . '/classes',
-        1 => __DIR__ . '/..' . '/robertbyrnes/dataconnection/classes',
     );
 
     public static $classMap = array (
@@ -18,8 +17,8 @@ class ComposerStaticInite989f021b5763cd61dc0305d5c48b528
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->fallbackDirsPsr4 = ComposerStaticInite989f021b5763cd61dc0305d5c48b528::$fallbackDirsPsr4;
-            $loader->classMap = ComposerStaticInite989f021b5763cd61dc0305d5c48b528::$classMap;
+            $loader->fallbackDirsPsr4 = ComposerStaticInit0d986fb979808e8b7c21735cde038d5e::$fallbackDirsPsr4;
+            $loader->classMap = ComposerStaticInit0d986fb979808e8b7c21735cde038d5e::$classMap;
 
         }, null, ClassLoader::class);
     }
