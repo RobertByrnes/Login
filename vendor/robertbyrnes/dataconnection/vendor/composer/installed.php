@@ -1,24 +1,24 @@
 <?php return array (
   'root' => 
   array (
-    'pretty_version' => 'dev-main',
-    'version' => 'dev-main',
+    'pretty_version' => '1.0-dev',
+    'version' => '1.0.0.0-dev',
     'aliases' => 
     array (
     ),
-    'reference' => '323d7f07838d9d68baa59ac7f59695f8fc6d8924',
+    'reference' => NULL,
     'name' => 'robertbyrnes/dataconnection',
   ),
   'versions' => 
   array (
     'robertbyrnes/dataconnection' => 
     array (
-      'pretty_version' => 'dev-main',
-      'version' => 'dev-main',
+      'pretty_version' => '1.0-dev',
+      'version' => '1.0.0.0-dev',
       'aliases' => 
       array (
       ),
-      'reference' => '323d7f07838d9d68baa59ac7f59695f8fc6d8924',
+      'reference' => NULL,
     ),
   ),
 );

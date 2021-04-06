@@ -1,8 +1,8 @@
 <?php return array (
   'root' => 
   array (
-    'pretty_version' => '1.0',
-    'version' => '1.0.0.0',
+    'pretty_version' => 'dev-main',
+    'version' => 'dev-main',
     'aliases' => 
     array (
     ),
@@ -13,17 +13,18 @@
   array (
     'robertbyrnes/dataconnection' => 
     array (
-      'pretty_version' => '1.0',
-      'version' => '1.0.0.0',
+      'pretty_version' => 'dev-main',
+      'version' => 'dev-main',
       'aliases' => 
       array (
+        0 => '9999999-dev',
       ),
-      'reference' => '1958f973f1071ab3c5d14d3bebdff1f3a2857a7c',
+      'reference' => 'b6330044a06c61fb40cf155a23bdb4230155fc0b',
     ),
     'robertbyrnes/login' => 
     array (
-      'pretty_version' => '1.0',
-      'version' => '1.0.0.0',
+      'pretty_version' => 'dev-main',
+      'version' => 'dev-main',
       'aliases' => 
       array (
       ),

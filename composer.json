@@ -1,15 +1,13 @@
 {
     "name": "robertbyrnes/login",
     "description": "PHP login script",
-    "version": "1.0",
     "license": "GPL-3.0-or-later",
     "require": {
-        "robertbyrnes/dataconnection": "^1.0"
+        "robertbyrnes/dataconnection": "dev-main"
     },
     "autoload": {
         "psr-4": {
-            "RBDev\\Login\\User\\": "classes/",
-            "RBDev\\Login\\Email_Message\\": "classes/"
+            "": "classes/"
         }
     }
 }

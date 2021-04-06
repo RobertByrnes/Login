@@ -1,5 +1,4 @@
 <?php
-Namespace RBDev\Login\User;
 
 require __DIR__ . '\..\vendor\autoload.php';
 

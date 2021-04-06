@@ -6,27 +6,9 @@ namespace Composer\Autoload;
 
 class ComposerStaticInitd48e4811491d1999850b3634929be4cf
 {
-    public static $prefixLengthsPsr4 = array (
-        'R' => 
-        array (
-            'RBDev\\Login\\User\\' => 17,
-            'RBDev\\Login\\Email_Message\\' => 26,
-        ),
-    );
-
-    public static $prefixDirsPsr4 = array (
-        'RBDev\\Login\\User\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/classes',
-        ),
-        'RBDev\\Login\\Email_Message\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/classes',
-        ),
-    );
-
     public static $fallbackDirsPsr4 = array (
-        0 => __DIR__ . '/..' . '/robertbyrnes/dataconnection/classes',
+        0 => __DIR__ . '/../..' . '/classes',
+        1 => __DIR__ . '/..' . '/robertbyrnes/dataconnection/classes',
     );
 
     public static $classMap = array (
@@ -36,8 +18,6 @@ class ComposerStaticInitd48e4811491d1999850b3634929be4cf
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitd48e4811491d1999850b3634929be4cf::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitd48e4811491d1999850b3634929be4cf::$prefixDirsPsr4;
             $loader->fallbackDirsPsr4 = ComposerStaticInitd48e4811491d1999850b3634929be4cf::$fallbackDirsPsr4;
             $loader->classMap = ComposerStaticInitd48e4811491d1999850b3634929be4cf::$classMap;
 
