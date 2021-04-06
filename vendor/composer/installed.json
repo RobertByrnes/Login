@@ -1,14 +1,9 @@
 {
-    "_readme": [
-        "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
-        "This file is @generated automatically"
-    ],
-    "content-hash": "7200d58b8e69630c2505b39a3ae7d66f",
     "packages": [
         {
             "name": "robertbyrnes/dataconnection",
             "version": "1.0",
+            "version_normalized": "1.0.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RobertByrnes/DataConnection.git",
@@ -20,7 +15,9 @@
                 "reference": "1958f973f1071ab3c5d14d3bebdff1f3a2857a7c",
                 "shasum": ""
             },
+            "time": "2021-04-04T15:58:04+00:00",
             "type": "library",
+            "installation-source": "dist",
             "autoload": {
                 "psr-4": {
                     "": "classes/"
@@ -32,16 +29,9 @@
                 "issues": "https://github.com/RobertByrnes/DataConnection/issues",
                 "source": "https://github.com/RobertByrnes/DataConnection/tree/1.0"
             },
-            "time": "2021-04-04T15:58:04+00:00"
+            "install-path": "../robertbyrnes/dataconnection"
         }
     ],
-    "packages-dev": [],
-    "aliases": [],
-    "minimum-stability": "stable",
-    "stability-flags": [],
-    "prefer-stable": false,
-    "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "dev": true,
+    "dev-package-names": []
 }
