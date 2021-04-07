@@ -7,15 +7,15 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/RobertByrnes/DataConnection.git",
-                "reference": "b6330044a06c61fb40cf155a23bdb4230155fc0b"
+                "reference": "708e6900a9bc069a72c3323790000d4ce7a7d3b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RobertByrnes/DataConnection/zipball/b6330044a06c61fb40cf155a23bdb4230155fc0b",
-                "reference": "b6330044a06c61fb40cf155a23bdb4230155fc0b",
+                "url": "https://api.github.com/repos/RobertByrnes/DataConnection/zipball/708e6900a9bc069a72c3323790000d4ce7a7d3b4",
+                "reference": "708e6900a9bc069a72c3323790000d4ce7a7d3b4",
                 "shasum": ""
             },
-            "time": "2021-04-06T21:54:06+00:00",
+            "time": "2021-04-07T10:57:08+00:00",
             "default-branch": true,
             "type": "library",
             "installation-source": "source",
