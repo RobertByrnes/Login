@@ -4,11 +4,11 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "01d69b8bdf3e44bbfc2e8cc7db59e9ee",
+    "content-hash": "74985211e4338dc2aff8c4d57a846cd7",
     "packages": [
         {
             "name": "robertbyrnes/dataconnection",
-            "version": "dev-main",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RobertByrnes/DataConnection.git",
@@ -34,7 +34,7 @@
             "description": "Database connection dependency using PDO for PHP 7^.",
             "support": {
                 "issues": "https://github.com/RobertByrnes/DataConnection/issues",
-                "source": "https://github.com/RobertByrnes/DataConnection/tree/main"
+                "source": "https://github.com/RobertByrnes/DataConnection/tree/master"
             },
             "time": "2021-04-07T10:57:08+00:00"
         }

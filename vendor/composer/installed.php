@@ -6,15 +6,15 @@
     'aliases' => 
     array (
     ),
-    'reference' => '152bc27cbfe18b475b70a7b5c4711a11d49faf42',
+    'reference' => 'd7a93fb86b0a782aedd83ac70b071a99fc96607e',
     'name' => 'robertbyrnes/login',
   ),
   'versions' => 
   array (
     'robertbyrnes/dataconnection' => 
     array (
-      'pretty_version' => 'dev-main',
-      'version' => 'dev-main',
+      'pretty_version' => 'dev-master',
+      'version' => 'dev-master',
       'aliases' => 
       array (
         0 => '9999999-dev',
@@ -28,7 +28,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '152bc27cbfe18b475b70a7b5c4711a11d49faf42',
+      'reference' => 'd7a93fb86b0a782aedd83ac70b071a99fc96607e',
     ),
   ),
 );

@@ -3,7 +3,7 @@
     "description": "PHP login script",
     "license": "GPL-3.0-or-later",
     "require": {
-        "robertbyrnes/dataconnection": "dev-main"
+        "robertbyrnes/dataconnection": "dev-master"
     },
     "autoload": {
         "psr-4": {
