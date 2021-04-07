@@ -9,14 +9,14 @@ class DataConnection extends Environment
      *
      * @var object
      */
-    private $dB;
+    protected $dB;
 
     /**
      * Class messages for debugging.
      *
      * @var string
      */
-    private $message;
+    protected $message;
 
     /**
      * A stdCLass object for use in type hinted functions.

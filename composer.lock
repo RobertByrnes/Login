@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/RobertByrnes/DataConnection.git",
-                "reference": "708e6900a9bc069a72c3323790000d4ce7a7d3b4"
+                "reference": "613c036e59d0ecf507f7f834461a2d13bfb6ec30"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RobertByrnes/DataConnection/zipball/708e6900a9bc069a72c3323790000d4ce7a7d3b4",
-                "reference": "708e6900a9bc069a72c3323790000d4ce7a7d3b4",
+                "url": "https://api.github.com/repos/RobertByrnes/DataConnection/zipball/613c036e59d0ecf507f7f834461a2d13bfb6ec30",
+                "reference": "613c036e59d0ecf507f7f834461a2d13bfb6ec30",
                 "shasum": ""
             },
             "default-branch": true,
@@ -36,7 +36,7 @@
                 "issues": "https://github.com/RobertByrnes/DataConnection/issues",
                 "source": "https://github.com/RobertByrnes/DataConnection/tree/master"
             },
-            "time": "2021-04-07T10:57:08+00:00"
+            "time": "2021-04-07T19:20:34+00:00"
         }
     ],
     "packages-dev": [],

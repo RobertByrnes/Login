@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '359f57348c122dd1e59e981a62525fd34df441d7',
+    'reference' => '4c63f94536088c2be2dd71069b9fcdc044e19da3',
     'name' => 'robertbyrnes/login',
   ),
   'versions' => 
@@ -19,7 +19,7 @@
       array (
         0 => '9999999-dev',
       ),
-      'reference' => '708e6900a9bc069a72c3323790000d4ce7a7d3b4',
+      'reference' => '613c036e59d0ecf507f7f834461a2d13bfb6ec30',
     ),
     'robertbyrnes/login' => 
     array (
@@ -28,7 +28,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '359f57348c122dd1e59e981a62525fd34df441d7',
+      'reference' => '4c63f94536088c2be2dd71069b9fcdc044e19da3',
     ),
   ),
 );
