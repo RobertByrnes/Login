@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6131f7f0d61bb73d65fb1c5e336cc69b",
+    "content-hash": "029c5ad51a0e3ddb050c19df54f282ba",
     "packages": [
         {
             "name": "robertbyrnes/dataconnection",

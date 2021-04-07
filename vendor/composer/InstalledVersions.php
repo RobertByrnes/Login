@@ -30,7 +30,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '190f8c8a48cc8a0f527ed257ae70cc584800f2ef',
+    'reference' => '359f57348c122dd1e59e981a62525fd34df441d7',
     'name' => 'robertbyrnes/login',
   ),
   'versions' => 
@@ -52,7 +52,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '190f8c8a48cc8a0f527ed257ae70cc584800f2ef',
+      'reference' => '359f57348c122dd1e59e981a62525fd34df441d7',
     ),
   ),
 );
